@@ -1,7 +1,6 @@
 import React, { useState, ReactElement, ChangeEvent, useEffect } from "react";
 import { RepoTableComponent } from "./repo-table.component";
-import { getRepos, RepoInfo } from "./data.service";
-import { message } from "antd";
+import { getRepos, RepoInfo, getRepos1 } from "./data.service";
 
 export class RepoSummaryComponent extends React.Component<{}, {data: RepoInfo[], searchQuery: string}> {
   constructor(props: {}) {
@@ -19,6 +18,7 @@ export class RepoSummaryComponent extends React.Component<{}, {data: RepoInfo[],
   async searchAndUpdateRecords() {
     try {
       const data = await getRepos(this.state.searchQuery);
+      const data1 = await getRepos1(this.state.searchQuery);
       this.setState({data});
     } catch (error) {
       console.log(error);

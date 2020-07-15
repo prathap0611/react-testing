@@ -11,10 +11,12 @@ describe("Test Parent Component", () => {
     }
   });
   const getReposMock = jest.fn();
+  const getReposMock1 = jest.fn();
   jest.doMock('./data.service', () => {
     return {
       __esModule: true,
-      getRepos: getReposMock
+      getRepos: getReposMock,
+      getRepos1: getReposMock1
     }
   })
   let wrapper: any;
@@ -31,10 +33,23 @@ describe("Test Parent Component", () => {
 
   test("Should fetch data on search", async() => {
     const mockData = [{name: 'name1', watchers: 12, forks: 6, issue: 2}];
-    getReposMock.mockResolvedValueOnce(mockData);
+    let resolveFn: (value?: unknown) => void;
+    const prom = new Promise((res) => {
+      resolveFn = res;
+    });
+    let resolveFn1: (value?: unknown) => void;
+    const prom1 = new Promise((res) => {
+      resolveFn1 = res;
+    });
+    getReposMock.mockImplementationOnce(() => prom);
+    getReposMock1.mockImplementationOnce(() => prom1);
+    // getReposMock.mockResolvedValueOnce(mockData);
+    wrapper.find('input').simulate('change', { target: { value: 'react' } });
+    wrapper.find('button').simulate('click');
     await act(async () => {
-      wrapper.find('input').simulate('change', { target: { value: 'react' } });
-      wrapper.find('button').simulate('click');
+      resolveFn(mockData);
+      resolveFn1(mockData);
+
     });
     expect(repoTableComponentMock).toHaveBeenLastCalledWith({ data: mockData}, {})
   });
